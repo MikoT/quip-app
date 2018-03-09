@@ -1,0 +1,33 @@
+{
+    "id": "LfJAjAYRWah",
+    "manifest_version": 1,
+    "name": "Video",
+    "version_name": "1.0",
+    "version_number": 1,
+    "sizing_mode": "fit_content",
+    "initial_height": 480,
+    "initial_width": 640,
+    "fill_container_max_width": 640,
+    "js_files": ["dist/app.js"],
+    "css_files": ["dist/app.css"],
+    "csp_sources": {
+        "script_srcs": [
+            "https://app.vidyard.com",
+            "https://d2i1pl9gz4hwa7.cloudfront.net",
+            "https://play.vidyard.com"
+        ],
+        "frame_srcs": [
+            "https://app.vidyard.com",
+            "https://play.vidyard.com"
+        ],
+        "style_srcs": [
+            "https://app.vidyard.com",
+            "https://play.vidyard.com"
+        ],
+        "img_srcs": [
+            "https://app.vidyard.com",
+            "https://play.vidyard.com",
+            "https://cdn.vidyard.com"
+        ]
+    }
+}
