@@ -80,7 +80,7 @@ export default class Comment extends React.Component {
     const author = quip.apps.getUserById(this.props.commentObject.authorId);
 
     // TODO: Is it possible to check whether a user is online or not?
-    const userOnline = true;
+    const userOnline = false;
     return (
       <div>
         <div className={Styles.commentWrapper} onMouseEnter={this.mouseEnter} onMouseLeave={this.mouseLeave}>
