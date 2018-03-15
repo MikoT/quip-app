@@ -97,9 +97,19 @@ export default class App extends React.Component {
 
     if (this.state.videoUuid === "") {
       return (
-        <div onClick={() => { !hasVideo && this.renderGoVideo() }} style={{border: hasVideo ? 'none' : '1px dashed #000'}} className={Styles.placeholder}>
-          <div style={{textAlign: 'center', fontSize: '50px'}}>+</div>
-          <div>Click to add a Video</div>
+        <div onClick={() => { !hasVideo && this.renderGoVideo() }} style={{border: hasVideo ? 'none' : '2px solid #29b6f2'}} className={Styles.placeholder}>
+          <div id='plus'>
+            <div id='plus-top' style={{display: 'flex', justifyContent: 'center'}}>
+              <div style={{ width: '20px', height: '20px', borderBottom: '1px solid #29b6f2', borderRight: '1px solid #29b6f2'}}></div>
+              <div style={{ width: '20px', height: '20px', borderBottom: '1px solid #29b6f2', borderLeft: '1px solid #29b6f2'}}></div>
+            </div>
+
+            <div id='plus-bottom' style={{display: 'flex', justifyContent: 'center'}}>
+              <div style={{ width: '20px', height: '20px', borderTop: '1px solid #29b6f2', borderRight: '1px solid #29b6f2'}}></div>
+              <div style={{ width: '20px', height: '20px', borderTop: '1px solid #29b6f2', borderLeft: '1px solid #29b6f2'}}></div>
+            </div>
+          </div>
+          <div style={{fontSize: '12px', marginTop: '16px'}}>Click to add a video</div>
         </div>
       );
     } else {

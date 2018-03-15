@@ -4,10 +4,10 @@
     "name": "Video",
     "version_name": "1.0",
     "version_number": 1,
-    "sizing_mode": "fit_content",
-    "initial_height": 480,
-    "initial_width": 640,
+    "sizing_mode": "fill_container",
     "fill_container_max_width": 640,
+    "initial_height": 360,
+    "initial_width": 800,
     "js_files": ["dist/app.js"],
     "css_files": ["dist/app.css"],
     "csp_sources": {

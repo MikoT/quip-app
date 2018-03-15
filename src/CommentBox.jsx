@@ -1,4 +1,4 @@
-import CommentListComment from "./CommentListComment.jsx";
+import Comment from "./Comment.jsx";
 import Styles from "./App.less";
 import classNames from "classnames/bind";
 let cx = classNames.bind(Styles);
@@ -9,7 +9,8 @@ export default class CommentBox extends React.Component {
 
     this.state = {
       commentList: this.props.rootRecord.get('comments'),
-      showing: false
+      showing: false,
+      newestCommentIndex: this.props.rootRecord.get('comments').length,
     }
   }
 
@@ -48,6 +49,7 @@ export default class CommentBox extends React.Component {
       event.target.value = null;
 
       const commentObject = {
+        id: this.state.commentList.length,
         chapter: this.props.currentChapter,
         position: this.props.currentTime,
         timeStamp: this.timeFormat(this.props.currentTime),
@@ -68,14 +70,25 @@ export default class CommentBox extends React.Component {
         }
         return 0;
       });
-      this.setState({commentList: commentList});
+
+      const newCommentIndex = commentList.findIndex(comment => {
+        return comment.id === commentObject.id;
+      });
+
       this.props.rootRecord.set('comments', commentList);
+      this.setState({commentList: commentList, newestCommentIndex: newCommentIndex, showing: true});
     }
+  }
+
+  componentDidMount() {
+    this.refs.commentsList.scrollTop = this.refs.commentsList.scrollHeight;
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (this.state.commentList.length != prevState.commentList.length) {
-      this.refs.commentsList.scrollTop = this.refs.commentsList.scrollHeight;
+      const commentHeight = 50;
+
+      this.refs.commentsList.scrollTop = this.refs.commentsList.childNodes[this.state.newestCommentIndex].offsetTop;
     }
   }
 
@@ -119,7 +132,7 @@ export default class CommentBox extends React.Component {
           {
             this.state.commentList.map((commentObject, index) => {
               if ( commentObject.chapter === this.props.currentChapter ) {
-                return <CommentListComment index={index} video={this.props.video} commentObject={commentObject} updateCommentList={this.updateCommentList} deleteComment={this.deleteComment} updateComment={this.updateComment}/>;
+                return <Comment index={index} video={this.props.video} commentObject={commentObject} updateCommentList={this.updateCommentList} deleteComment={this.deleteComment} updateComment={this.updateComment}/>;
               }
             })
           }

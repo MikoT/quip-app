@@ -28,6 +28,16 @@ class GoVideoRoot extends quip.apps.RootRecord {
 
 quip.apps.registerClass(GoVideoRoot, "root");
 
+const colors = [
+    quip.apps.ui.ColorMap.RED.KEY,
+    quip.apps.ui.ColorMap.ORANGE.KEY,
+    quip.apps.ui.ColorMap.YELLOW.KEY,
+    quip.apps.ui.ColorMap.GREEN.KEY,
+    quip.apps.ui.ColorMap.BLUE.KEY,
+    quip.apps.ui.ColorMap.VIOLET.KEY,
+];
+
+
 quip.apps.initialize({
   initializationCallback: function(rootNode) {
     var rootRecord = quip.apps.getRootRecord();
@@ -37,5 +47,8 @@ quip.apps.initialize({
     $script(["https://app.vidyard.com/v1/embed.js"], () => {
       ReactDOM.render(<App rootRecord={rootRecord} />, rootNode);
     });
-  }
+},
+  toolbarCommandIds: [
+    quip.apps.DocumentMenuCommands.MENU_MAIN
+  ],
 });

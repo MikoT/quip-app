@@ -1,76 +1,125 @@
 import Styles from "./App.less";
-import classNames from "classnames/bind";
-let cx = classNames.bind(Styles);
+import ReplyInput from "./ReplyInput.jsx";
+import Reply from "./Reply.jsx";
 
 export default class Comment extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      commenting: false,
-    };
-  }
-
-  postComment() {
-    this.props.player.pause();
-    this.setState({commenting: true});
-  }
-
-    handleInputSubmit(event) {
-    if (event.keyCode === 13) {
-      const comment = event.target.value;
-      const timestamp = this.refs.timestamp.value;
-      event.target.value = '';
-      this.setState({commenting: false});
-      const chapterId = this.props.player.status.chapterIndex;
-      const videoName = this.props.player.metadata.chapters_attributes[chapterId].video_attributes.name;
-
-      const message = `${videoName} _________________________ [${timestamp}] ${comment}`;
-      quip.apps.sendMessage(message);
+      commentObject: {},
+      commentHovered: false,
+      showReplies: true,
+      replying: false
     }
   }
 
-  timeFormat(seconds) {
-    // TAKEN FROM STACKOVERFLOW.
-    // 2- Extract hours:
-    let hours = parseInt(seconds / 3600); // 3,600 seconds in 1 hour
-    seconds = seconds % 3600; // seconds remaining after extracting hours
-    // 3- Extract minutes:
-    let minutes = parseInt(seconds / 60); // 60 seconds in 1 minute
-    // 4- Keep only seconds not extracted to minutes:
-    seconds = parseInt(seconds % 60);
-    let formattedSeconds = '', formattedHours = '', formattedMinutes = '';
-    if (seconds < 10) {
-      formattedSeconds = "0" + seconds;
-    } else {
-      formattedSeconds = seconds;
-    }
-    if (minutes < 10) {
-      formattedMinutes = "0" + minutes;
-    } else {
-      formattedMinutes = minutes;
-    }
-    if (hours < 10) {
-      formattedHours = "0" + hours;
-    } else {
-      formattedHours = hours;
-    }
+  resetState() {
+    this.setState({
+      commentHovered: false,
+      showReplies: true,
+      replying: false
+    });
+  }
 
-    return formattedHours + ":" + formattedMinutes + ":" + formattedSeconds;
+  componentDidUpdate(prevProps) {
+    if (prevProps.commentObject.id != this.props.commentObject.id) {
+      this.resetState();
+    }
+  }
+
+  mouseEnter = e => {
+    this.setState({commentHovered: true});
+  }
+
+  mouseLeave = e => {
+    this.setState({commentHovered: false});
+  }
+
+  triggerReply = e => {
+    this.setState({replying: true, showReplies: true});
+    // TODO: scroll to bottom of replies
+  }
+
+  hideReply = e => {
+    this.setState({replying: false, showReplies: false});
+  }
+
+  addReply = reply => {
+    let originalComment = Object.assign({}, this.props.commentObject);
+    originalComment.replies.push(reply);
+
+    this.setState({commentObject: originalComment})
+    this.props.updateCommentList(originalComment, this.props.index);
+  }
+
+  deleteReply = index => {
+    let originalCommentClone = Object.assign({}, this.props.commentObject);
+    originalCommentClone.replies.splice(index, 1);
+
+    this.props.updateComment(originalCommentClone, this.props.index);
+  }
+
+  triggerDelete = () => {
+    this.props.deleteComment(this.props.index);
+  }
+
+  renderCommentOptions() {
+    return (
+      <span>
+        <span onClick={this.triggerDelete} className={Styles.commentLink}>Delete</span>
+        { !this.state.replying && <span><span style={{marginLeft: '10px'}}>&middot;</span><span onClick={this.triggerReply} className={Styles.commentLink}>Reply</span></span> }
+        { (this.props.commentObject.replies.length > 0) && <span style={{marginLeft: '10px'}}>&middot;</span>}
+        { !this.state.showReplies && (this.props.commentObject.replies.length > 0) && <span onClick={this.triggerReply} className={Styles.commentLink}>Show {this.props.commentObject.replies.length} Replies</span> }
+        { this.state.showReplies && (this.props.commentObject.replies.length > 0) && <span onClick={this.hideReply} className={Styles.commentLink}>Hide Replies</span> }
+      </span>
+    );
   }
 
   render() {
+    const author = quip.apps.getUserById(this.props.commentObject.authorId);
+
+    // TODO: Is it possible to check whether a user is online or not?
+    const userOnline = true;
     return (
-      <div id='comment-section' className={cx({commentSection: true})}>
-        <quip.apps.ui.Button
-          text='Timestamp Comment'
-          className={ cx({ commentButton: true }) }
-          onClick={ () => { this.postComment(); }}
-        />
-        <input ref='timestamp' className={ cx({ timeInput: true }) } value={ this.timeFormat(this.props.currentTime) } disabled></input>
-        <input className={ cx({commentInput: true, commentInputOpen: this.state.commenting}) }
-          placeholder='Write a comment...' onKeyDown={e => {this.handleInputSubmit(e)}}></input>
+      <div>
+        <div className={Styles.commentWrapper} onMouseEnter={this.mouseEnter} onMouseLeave={this.mouseLeave}>
+          <div>
+            <span className={Styles.profilePictureWrapper}>
+              <quip.apps.ui.ProfilePicture user={author} size={40} round={true}/>
+              { userOnline && <div className={Styles.onlineUser}></div> }
+            </span>
+          </div>
+          <div className={Styles.commentContent}>
+            <div className={Styles.commentAuthorWrapper}>
+              <span className={Styles.commentAuthor}>{author.getName()}</span>
+              {this.state.commentHovered && this.renderCommentOptions()}
+            </div>
+            <div>
+              <button className={Styles.timestampLink}
+                onClick={() => { this.props.video.play(); this.props.video.seek(this.props.commentObject.position); }}>
+                  [{this.props.commentObject.timeStamp}]
+              </button>
+              <span style={{marginLeft:'4px'}}>{this.props.commentObject.comment}</span>
+            </div>
+          </div>
+        </div>
+        <div className={Styles.repliesWrapper}>
+          { this.state.showReplies && this.props.commentObject.replies.map((reply, index) => {
+            return (
+              <Reply index={index} replyObject={reply} deleteReply={this.deleteReply}/>
+            );
+          })}
+        </div>
+        { this.state.replying && <ReplyInput addReply={this.addReply} /> }
       </div>
     );
   }
-}
+};
+
+Comment.propTypes = {
+  commentObject: React.PropTypes.object,
+  index: React.PropTypes.number,
+  updateCommentList: React.PropTypes.function,
+  deleteComment: React.PropTypes.function
+};

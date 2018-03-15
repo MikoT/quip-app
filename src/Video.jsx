@@ -1,5 +1,4 @@
 import Styles from "./App.less";
-import Comment from "./Comment.jsx";
 import CommentBox from "./CommentBox.jsx";
 
 export default class Video extends React.Component {
@@ -37,8 +36,22 @@ export default class Video extends React.Component {
   }
 
   componentDidMount() {
-    this.loadVideoScript().then((test) => {
+    this.loadVideoScript().then(() => {
       this.setupVideoListeners();
+      // Create Menu Options
+      quip.apps.updateToolbar({
+        menuCommands: [
+          {
+            id: quip.apps.DocumentMenuCommands.MENU_MAIN,
+            subCommands: ["viewInVidyard"],
+          },
+          {
+            id: "viewInVidyard",
+            label: "View in Vidyard",
+            handler: () => { window.open(`https://secure.vidyard.com/organizations/${this.state.player.org.id}/players/${this.props.videoUuid}/settings`) }
+          }
+        ],
+      });
     });
   }
 
@@ -65,7 +78,7 @@ export default class Video extends React.Component {
     return (
       <div>
         <div id='player-embed' style={{width: '640', height: '360'}}>
-          <img style={{width: '100%', height: '100%'}} className="vidyard-player-embed" src={`https://play.vidyard.com/${this.props.videoUuid}.jpg`} data-uuid={this.props.videoUuid} data-v="4" data-type="inline"/>
+          <img className="vidyard-player-embed" data-uuid={this.props.videoUuid} data-v="4" data-type="inline"/>
         </div>
         <CommentBox video={this.state.player} currentChapter={this.state.currentChapter} currentTime={this.state.currentTime} rootRecord={this.props.rootRecord}/>
       </div>
