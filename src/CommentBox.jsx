@@ -139,7 +139,7 @@ export default class CommentBox extends React.Component {
         </div>
         <input onFocus={() => {this.props.video.pause()} } className={Styles.commentInput}
           style={{borderLeft: '1px solid rgba(0, 0, 0, 0.12)', borderRight: '1px solid rgba(0, 0, 0, 0.12)',
-            borderBottom: '1px solid rgba(0, 0, 0, 0.12)', borderRadius: '0 0 5px 5px', width: '640px'}}
+            borderBottom: '1px solid rgba(0, 0, 0, 0.12)', borderRadius: '0 0 5px 5px', width: '100%'}}
             placeholder='Type a message...' onKeyDown={e => {this.handleInputSubmit(e)}}>
         </input>
         <div className={Styles.toggleCommentWrapper}>

@@ -10,11 +10,42 @@ export default class Video extends React.Component {
       playing: false,
       currentTime: 0,
       currentChapter: 0,
+      height: 40,
     };
+  }
+
+  resize = () => {
+    const dimensions = quip.apps.getCurrentDimensions();
+    const height = dimensions.width / 1.7778;
+    quip.apps.removeEventListener(quip.apps.EventType.CONTAINER_SIZE_UPDATE, this.resize);
+
+    this.setState({height: height});
+
+    let aspectRatio = 1;
+    switch(true) {
+      case (height < 100):
+        aspectRatio = 2.8;
+        break;
+      case (height < 220):
+        aspectRatio = 2;
+        break;
+      case (height < 300):
+        aspectRatio = 0.95;
+        break;
+      default:
+        aspectRatio = 0.9;
+        break;
+    }
+    console.log(height);
+    console.log(aspectRatio);
+    quip.apps.setWidthAndAspectRatio(dimensions.width, aspectRatio);
+
+    quip.apps.addEventListener(quip.apps.EventType.CONTAINER_SIZE_UPDATE, this.resize);
   }
 
   setupVideoListeners() {
     const player = VidyardV4.players[0];
+    this.resize();
 
     player.on('play', () => {
       this.setState({playing: true, currentChapter: player.getCurrentChapter()});
@@ -33,6 +64,7 @@ export default class Video extends React.Component {
     });
 
     this.setState({player: player});
+    quip.apps.enableResizing();
   }
 
   componentDidMount() {
@@ -77,7 +109,7 @@ export default class Video extends React.Component {
   render() {
     return (
       <div>
-        <div id='player-embed' style={{width: '640', height: '360'}}>
+        <div id='player-embed' style={{width: '100%', height: `${this.state.height}px`}}>
           <img className="vidyard-player-embed" data-uuid={this.props.videoUuid} data-v="4" data-type="inline"/>
         </div>
         <CommentBox video={this.state.player} currentChapter={this.state.currentChapter} currentTime={this.state.currentTime} rootRecord={this.props.rootRecord}/>
