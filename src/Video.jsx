@@ -33,6 +33,8 @@ export default class Video extends React.Component {
     });
 
     this.setState({player: player});
+
+    quip.apps.setWidthAndAspectRatio(640, 0.7);
   }
 
   componentDidMount() {
